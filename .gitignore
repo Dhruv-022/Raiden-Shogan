@@ -1,0 +1,27 @@
+# Environment Variables (CRITICAL: Never commit bot tokens or sensitive IDs)
+.env
+*.env
+
+# Local Database Files (Prevents committing active ticket states)
+tickets.json
+*.json
+!package.json
+
+# Python Cache & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# PM2 Logs & Process Files
+logs/
+*.log
+.pm2/
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
