@@ -182,14 +182,13 @@ class TicketSystem(commands.Cog):
                     await message.channel.send(f"⚡ **Error:** Category ID `{self.category_id}` is invalid or resolved as `{type(category).__name__}`.")
                     return
 
-                # Build channel permission overwrites
+                # Build channel permission overwrites (STAFF & BOT ONLY)
                 overwrites = {
                     message.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-                    message.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True),
-                    message.author: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+                    message.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
                 }
 
-                # Explicitly add your developer user account so channels are never hidden from you
+                # Explicitly add your developer user account
                 dev_user = message.guild.get_member(BOT_OWNER_ID)
                 if dev_user:
                     overwrites[dev_user] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
@@ -301,25 +300,20 @@ class TicketSystem(commands.Cog):
     @commands.command(name="delete", aliases=["purge", "clear"])
     async def purge_messages(self, ctx: commands.Context, amount: int = None):
         """Purges up to 44 messages from the current channel."""
-        # 1. Authority Check: Owner or Staff Roles
         if not self.is_staff_or_owner(ctx.author, "manage_messages"):
             await ctx.send("⚡ **Decree:** You lack the required authority to purge messages.")
             return
 
-        # 2. Input Validation
         if amount is None or amount <= 0:
             await ctx.send("⚡ Please specify a valid number of messages to purge (e.g., `!delete 10` or `@Raiden Shogun delete 10`).")
             return
 
-        # Cap the purge count at a maximum of 44
         purge_count = min(amount, 44)
 
         try:
-            # Delete the invocation command message first, then purge target count
             await ctx.message.delete()
             deleted = await ctx.channel.purge(limit=purge_count)
 
-            # Send a temporary confirmation message that auto-deletes after 3 seconds
             confirm_msg = await ctx.send(f"⚡ **Shogunate Purge:** Cleared `{len(deleted)}` message(s).")
             await asyncio.sleep(3)
             await confirm_msg.delete()
